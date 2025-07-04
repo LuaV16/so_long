@@ -6,7 +6,7 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 13:02:37 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/03 17:12:57 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/04 13:17:03 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ char *ft_strncpy(char *dest, const char *src, int n);
 int ft_strcmp(char *s1, char *s2);
 int has_ber_extension(char *filename);
 void check_errors(char *filename);
-void get_width_and_height(int fd, int *width, int *height);
+void	get_width_and_height(int fd, size_t *width, size_t *height);
+size_t	get_width(const char *s);
 
 #endif
