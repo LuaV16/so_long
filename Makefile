@@ -1,6 +1,6 @@
 NAME = so_long
 
-SRC = $(addprefix src/, main.c)
+SRC = $(addprefix src/, main.c libft_utils.c errors.c)
 GNL_SRC = $(addprefix gnl/, get_next_line.c get_next_line_utils.c)
 
 OBJ := $(SRC:%.c=%.o)
@@ -9,13 +9,18 @@ GNL_OBJ := $(GNL_SRC:%.c=%.o)
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-all: $(NAME)
+MLX = MLX42/build/libmlx42.a
+
+all: $(MLX) $(NAME)
 
 $(NAME): $(OBJ) $(GNL_OBJ)
-	$(CC) $^ -Lmlx_linux -lmlx_Linux -L/usr/lib -Imlx_linux -lXext -lX11 -lm -lz -o $(NAME)
+	$(CC) $(CFLAGS) -fPIE $^ -LMLX42/build -lmlx42 -ldl -lglfw -lm -lX11 -lpthread -pie -o $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) -Iincludes -Imlx_linux -O3 -c $< -o $@
+	$(CC) $(CFLAGS) -fPIE -Iincludes -IMLX42/include -O3 -c $< -o $@
+
+$(MLX):
+	cd MLX42 && cmake -B build && cmake --build build
 
 clean:
 	rm -f $(OBJ) $(GNL_OBJ)

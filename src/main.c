@@ -6,109 +6,100 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 13:01:00 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/06/25 18:16:31 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/03 16:39:40 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "so_long.h"
 #include "get_next_line.h"
 
-typedef struct s_data {
-    void    *img;
-    char    *addr;
-    int     bits_per_pixel;
-    int     line_lenght;
-    int     endian;
-}   t_data;
-
-void    my_mlx_pixel_put(t_data *data, int x, int y, int color)
+void get_width_and_height(int fd, int *width, int *height)
 {
-    char *dst;
+    char *line;
+    char *tmp;
 
-    dst = data->addr + (y * data->line_lenght + x * (data->bits_per_pixel / 8));
-    *(unsigned int*)dst = color;
-}
-
-size_t	ft_linelen(const char *s)
-{
-	int	len;
-
-	len = 0;
-	if (s == NULL)
-		return (0);
-	while (*s && *s != '\0' && *s != '\n')
-	{
-		len++;
-		s++;
-	}
-	return (len);
-}
-
-char **create_matrix(line_number, line_size)
-{
-    char **matrix;
-    int n;
-
-    matrix = (char **)malloc((line_number + 1) * sizeof(char *));
-    if (matrix == NULL) {
-        perror("Error al reservar memoria");
-        return (NULL);
-    }
-    n = 0;
-    while (n < line_number)
+    line = get_next_line(fd);
+    *width = 0;
+    *height = 0;
+    if (line)
     {
-        matrix[n] = (char *)malloc((line_size + 1) * sizeof(char));
-        n++;
-        if (matrix[n] == NULL) 
+        tmp = line;
+        while (*line && *line != '\n')
         {
-            perror("Error al reservar memoria");
-            return (NULL);
+            (*width)++;
+            line++;
         }
+        (*height)++;
+        free(tmp);
+    }
+    line = get_next_line(fd);
+    while (line)
+    {
+        free(line);
+        line = get_next_line(fd);
+        (*height)++;
     }
 }
 
-int check_size(fd)
+char **fill_matrix(int fd, int width, int height)
 {
-    char    *line;
-    int     line_number;
-    size_t     line_size;
-    int     first_time;
-
-    first_time = 0;
-    line_number = 0;
-    while (1)
+    char *line;
+    char **map;
+    int y;
+    
+    map = (char **)malloc((height + 1) * sizeof(char **));
+    if (!map)
+        return (NULL);
+    y = 0;
+    while (y < height)
     {
         line = get_next_line(fd);
-        if (line == NULL)
+        if (!line)
             break ;
-        else
-            line_number++;
-        if (first_time == 0)
-        {
-            line_size = ft_linelen(line);
-            first_time = 1;
-        }
-        if (ft_linelen(line) > line_size || ft_linelen(line) < line_size)
-            return (-1);
+        map[y] = (char *)malloc((width + 1) * sizeof(char));
+        if (!map[y])
+            return (NULL);
+        ft_strncpy(map[y], line, width);
+        map[y][width] = '\0';
+        free(line);
+        y++;
     }
-    return (line_number);
+    map[y] = NULL;
+    return(map);
+}
+
+char **read_map(char *filename)
+{
+    int fd1;
+    int fd2;
+    int width;
+    int height;
+    char **map;
+
+    fd1 = open(filename, O_RDONLY);
+    if (fd1 < 0)
+    {
+        perror("Error\nArchivo no válido."), 
+        exit(1);
+    }
+    get_width_and_height(fd1, &width, &height);
+    close(fd1);
+    fd2 = open(filename, O_RDONLY);
+    if (fd2 < 0)
+    {
+        perror("Error\nArchivo no válido."), 
+        exit(1);
+    }
+    map = fill_matrix(fd2, width, height);
+    close(fd2);
+    return(map);
 }
 
 int main(void)
 {
-    int fd;
-    int line_number;
-    char **matrix;
-
-    fd = open("./maps/valid1.ber", O_RDONLY);
-    line_number = check_size(fd);
-    close(fd);
-    if (line_number == -1)
-        perror("Todas las líneas deben ser del mismo tamaño.");
-    else
-    {
-        fd = open("./maps/valid1.ber", O_RDONLY);
-        matrix = create_matrix(line_number, //line size! meter como variable global)
-    }
+    open("maps/valid1.ber", O_RDONLY);
+    check_errors("maps/valid1");
+    read_map("maps/valid1.ber");
+    
     return (0);
 }
