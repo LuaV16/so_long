@@ -6,7 +6,7 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 16:30:47 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/04 14:00:08 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/28 20:52:55 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,12 @@ int	has_ber_extension(char *filename)
 	return (ft_strcmp(filename + len - 4, ".ber") == 0);
 }
 
-int	has_right_dimensions(char *filename)
+int	has_right_dimensions(char *filename, size_t width, size_t height)
 {
 	char	*line;
-	size_t	width;
-	size_t	height;
 	size_t	n;
 	int		fd;
 
-	fd = open(filename, O_RDONLY);
-	get_width_and_height(fd, &width, &height);
-	close(fd);
 	n = 0;
 	fd = open(filename, O_RDONLY);
 	while (n < height)
@@ -42,40 +37,59 @@ int	has_right_dimensions(char *filename)
 		if (get_width(line) != width)
 		{
 			free(line);
+			line = NULL;
 			return (0);
 		}
 		free(line);
 		n++;
 	}
+	close(fd);
 	return (1);
 }
 
-int has_walls(char *filename)
+int check_line_walls(char *line, size_t width, size_t j, size_t height, int fd)
 {
-	char	*line;
-	int n;
-	int		fd;
+	size_t	i;
 
-	fd = open(filename, O_RDONLY);
-	line = get_next_line(fd);
-	while (line)
+	if (j == 0 || j == height - 1)
 	{
-		n = 0;
-		while (line[n] != '\n')
+		i = 0;
+		while (line[i] != '\0' && line[i] != '\n')
 		{
-			if (line[n] != '1')
-			{
-				
-			}
-			n++;
+			if (line[i] != '1')
+				return (free(line), close(fd), 0);
+			i++;
 		}
-		free(line);
-		n++;
+	}
+	else
+	{
+		if (line[0] != '1' || line[width - 1] != '1')
+			return (free(line), close(fd), 0);
 	}
 	return (1);
 }
 
-void	check_errors(char *filename)
+int has_walls(char *filename, size_t width, size_t height)
+{
+	char	*line;
+	size_t	j;
+	int		fd;
+
+	fd = open(filename, O_RDONLY);
+	j = 0;
+	while (j < height)
+	{
+		line = get_next_line(fd);
+		if (!check_line_walls(line, width, j, height, fd))
+			return (0);
+		free(line);
+		j++;
+	}
+	close(fd);
+	return (1);
+}
+
+void	check_errors(char *filename, size_t width, size_t height)
 {
 	int	ignored;
 
@@ -85,9 +99,15 @@ void	check_errors(char *filename)
 		(void)ignored;
 		exit(1);
 	}
-	if (has_right_dimensions(filename) == 0)
+	if (has_right_dimensions(filename, width, height) == 0)
 	{
-		ignored = write(1, "Error\nDimensiones del mapa no válidas.\n", 39);
+		ignored = write(1, "Error\nDimensiones del mapa no válidas.\n", 40);
+		(void)ignored;
+		exit(1);
+	}
+	if (has_walls(filename, width, height) == 0)
+	{
+		ignored = write(1, "Error\nEl mapa debe tener paredes.\n", 34);
 		(void)ignored;
 		exit(1);
 	}

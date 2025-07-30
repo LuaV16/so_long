@@ -1,6 +1,6 @@
 NAME = so_long
 
-SRC = $(addprefix src/, main.c libft_utils.c errors.c)
+SRC = $(addprefix src/, main.c libft_utils.c errors.c frees.c check_map.c map.c)
 GNL_SRC = $(addprefix gnl/, get_next_line.c get_next_line_utils.c)
 
 OBJ := $(SRC:%.c=%.o)

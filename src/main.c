@@ -6,7 +6,7 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 13:01:00 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/04 13:31:54 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/29 13:06:39 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	get_width_and_height(int fd, size_t *width, size_t *height)
 		line = get_next_line(fd);
 		(*height)++;
 	}
+	free(line);
 }
 
 char	**fill_matrix(int fd, int width, int height)
@@ -49,7 +50,7 @@ char	**fill_matrix(int fd, int width, int height)
 
 	map = (char **)malloc((height + 1) * sizeof(char **));
 	if (!map)
-		return (NULL);
+		return (free(map), map = NULL, NULL);
 	y = 0;
 	while (y < height)
 	{
@@ -58,22 +59,19 @@ char	**fill_matrix(int fd, int width, int height)
 			break ;
 		map[y] = (char *)malloc((width + 1) * sizeof(char));
 		if (!map[y])
-			return (NULL);
+			return (free(map), map = NULL, NULL);
 		ft_strncpy(map[y], line, width);
 		map[y][width] = '\0';
 		free(line);
 		y++;
 	}
-	map[y] = NULL;
 	return (map);
 }
 
-char	**read_map(char *filename)
+char	**read_map(char *filename, size_t width, size_t height)
 {
 	int		fd1;
 	int		fd2;
-	size_t	width;
-	size_t	height;
 	char	**map;
 
 	fd1 = open(filename, O_RDONLY);
@@ -81,7 +79,6 @@ char	**read_map(char *filename)
 	{
 		// Meter error
 	}
-	get_width_and_height(fd1, &width, &height);
 	close(fd1);
 	fd2 = open(filename, O_RDONLY);
 	if (fd2 < 0)
@@ -95,8 +92,18 @@ char	**read_map(char *filename)
 
 int	main(void)
 {
-	open("maps/valid1.ber", O_RDONLY);
-	check_errors("maps/valid1.ber");
-	read_map("maps/valid1.ber");
+	char **map;
+	int fd;
+	size_t	width;
+	size_t	height;
+	
+	fd = open("maps/valid1.ber", O_RDONLY);
+	get_width_and_height(fd, &width, &height);
+	check_errors("maps/valid1.ber", width, height);
+	map = read_map("maps/valid1.ber", width, height);
+
+	start_window();	
+	
+	free_map(map);
 	return (0);
 }
