@@ -6,7 +6,7 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 13:01:00 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/29 13:06:39 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:21:39 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ int	main(void)
 	check_errors("maps/valid1.ber", width, height);
 	map = read_map("maps/valid1.ber", width, height);
 
-	start_window();	
+	start_window(map, width, height);
 	
 	free_map(map);
 	return (0);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   errors.c                                           :+:      :+:    :+:   */
+/*   map_errors_1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 16:30:47 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/28 20:52:55 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/07/30 13:31:09 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	has_right_dimensions(char *filename, size_t width, size_t height)
 	return (1);
 }
 
-int check_line_walls(char *line, size_t width, size_t j, size_t height, int fd)
+int	check_line_walls(char *line, size_t width, size_t j, size_t height, int fd)
 {
 	size_t	i;
 
@@ -69,7 +69,7 @@ int check_line_walls(char *line, size_t width, size_t j, size_t height, int fd)
 	return (1);
 }
 
-int has_walls(char *filename, size_t width, size_t height)
+int	has_walls(char *filename, size_t width, size_t height)
 {
 	char	*line;
 	size_t	j;
@@ -91,7 +91,7 @@ int has_walls(char *filename, size_t width, size_t height)
 
 void	check_errors(char *filename, size_t width, size_t height)
 {
-	int	ignored;
+	int	ignored; // CAMBIAR EN ALGUN MOMENTO
 
 	if (has_ber_extension(filename) == 0)
 	{
