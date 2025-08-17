@@ -6,7 +6,7 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 12:16:52 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/30 13:28:12 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/08/17 20:16:39 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,26 +66,25 @@ void	put_walls(char **map, mlx_t *mlx, size_t width, size_t height)
 	}
 }
 
-void	put_character(char **map, mlx_t *mlx, size_t width, size_t height)
+void	put_character(t_game *paquita)
 {
-	size_t			x;
-	size_t			y;
 	mlx_texture_t	*character_tex;
 	mlx_image_t		*character_img;
+	int x;
+	int y;
 
-	character_tex = mlx_load_png("graphics/paquita.png");
-	character_img = mlx_texture_to_image(mlx, character_tex);
+	character_tex = mlx_load_png("graphics/paquita_down1.png");
+	character_img = mlx_texture_to_image(paquita->mlx, character_tex);
 	mlx_delete_texture(character_tex);
 	x = 0;
-	while (x < height)
+	while (x < paquita->map_height)
 	{
 		y = 0;
-		while (y < width)
+		while (y < paquita->map_width)
 		{
-			if (map[x][y] == 'P')
+			if (paquita->map[x][y] == 'P')
 			{
-				mlx_image_to_window(mlx, character_img, y * TILE_SIZE, x
-					* TILE_SIZE);
+				mlx_image_to_window(paquita->mlx, character_img, paquita->player_x * TILE_SIZE, paquita->player_y * TILE_SIZE);
 			}
 			y++;
 		}
@@ -100,7 +99,7 @@ void	put_exit(char **map, mlx_t *mlx, size_t width, size_t height)
 	mlx_texture_t	*exit_tex;
 	mlx_image_t		*exit_img;
 
-	exit_tex = mlx_load_png("graphics/Navarrete.png");
+	exit_tex = mlx_load_png("graphics/navarrete.png");
 	exit_img = mlx_texture_to_image(mlx, exit_tex);
 	mlx_delete_texture(exit_tex);
 	x = 0;
@@ -120,22 +119,17 @@ void	put_exit(char **map, mlx_t *mlx, size_t width, size_t height)
 	}
 }
 
-void	start_window(char **map, size_t width, size_t height)
+void	start_window(t_game *paquita)
 {
-	mlx_t	*mlx;
-
-	mlx = mlx_init(width * TILE_SIZE, height * TILE_SIZE, "Paquita", false);
-	if (!mlx)
+	paquita->mlx = mlx_init(paquita->map_width * TILE_SIZE, paquita->map_height * TILE_SIZE, "Paquita", false);
+	if (!paquita->mlx)
 	{
 		printf("Error: mlx_init falló\n");
 		return ;
 	}
-	put_floor(map, mlx, width, height);
-	put_walls(map, mlx, width, height);
-	put_character(map, mlx, width, height);
-	put_exit(map, mlx, width, height);
-	put_collectibles(map, mlx, width, height);
-	put_enemys(map, mlx, width, height);
-	mlx_loop(mlx);
-	mlx_terminate(mlx);
+	put_map(paquita);
+	get_collectibles(paquita);
+	mlx_key_hook(paquita->mlx, key_hook, paquita);
+	mlx_loop(paquita->mlx);
+	mlx_terminate(paquita->mlx);
 }

@@ -6,30 +6,30 @@
 /*   By: lvargas- <lvargas-@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 13:01:00 by lvargas-          #+#    #+#             */
-/*   Updated: 2025/07/30 12:21:39 by lvargas-         ###   ########.fr       */
+/*   Updated: 2025/08/17 20:09:37 by lvargas-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include "so_long.h"
 
-void	get_width_and_height(int fd, size_t *width, size_t *height)
+void	get_width_and_height(int fd, t_game *paquita)
 {
 	char	*line;
 	char	*tmp;
 
 	line = get_next_line(fd);
-	*width = 0;
-	*height = 0;
+	paquita->map_width = 0;
+	paquita->map_height = 0;
 	if (line)
 	{
 		tmp = line;
 		while (*line && *line != '\n')
 		{
-			(*width)++;
+			(paquita->map_width)++;
 			line++;
 		}
-		(*height)++;
+		(paquita->map_height)++;
 		free(tmp);
 	}
 	line = get_next_line(fd);
@@ -37,7 +37,7 @@ void	get_width_and_height(int fd, size_t *width, size_t *height)
 	{
 		free(line);
 		line = get_next_line(fd);
-		(*height)++;
+		(paquita->map_height)++;
 	}
 	free(line);
 }
@@ -92,18 +92,20 @@ char	**read_map(char *filename, size_t width, size_t height)
 
 int	main(void)
 {
-	char **map;
+	t_game paquita;
 	int fd;
-	size_t	width;
-	size_t	height;
 	
 	fd = open("maps/valid1.ber", O_RDONLY);
-	get_width_and_height(fd, &width, &height);
-	check_errors("maps/valid1.ber", width, height);
-	map = read_map("maps/valid1.ber", width, height);
+	get_width_and_height(fd, &paquita);
+	check_errors("maps/valid1.ber", &paquita);
+	paquita.map = read_map("maps/valid1.ber", paquita.map_width, paquita.map_height);
+	check_map(&paquita);
+	free_map(paquita.map);
+	paquita.map = read_map("maps/valid1.ber", paquita.map_width, paquita.map_height);
 
-	start_window(map, width, height);
-	
-	free_map(map);
+	paquita.moves = 0;
+	paquita.win_condition = 0;
+	start_window(&paquita);
+	free_map(paquita.map);
 	return (0);
 }
